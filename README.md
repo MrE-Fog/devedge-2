@@ -1,3 +1,1 @@
-# devedge.github.io
-
-Github pages blog
+# [devedge.github.io](https://devedge.github.io)
