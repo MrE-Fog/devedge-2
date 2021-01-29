@@ -14,7 +14,7 @@ This is the end result, and setting up the backend infrastructure to make this p
 
 ---
 
-### Glossary
+### Table of Contents
 
 - [Intro](#intro)
 - [Architecture](#architecture)
