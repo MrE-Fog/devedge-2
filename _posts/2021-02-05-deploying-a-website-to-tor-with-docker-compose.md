@@ -2,7 +2,7 @@
 layout: post
 title: "deploying a website to Tor with docker-compose"
 description: "and generating an Onion v3 vanity URL"
-date: 2021-01-26
+date: 2021-02-05
 tags: [tor, docker, docker-compose, blog]
 ---
 
