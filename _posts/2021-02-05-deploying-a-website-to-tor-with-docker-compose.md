@@ -265,6 +265,14 @@ WORKDIR /webcontent/devedge.github.io
 CMD jekyll serve --host 0.0.0.0
 ```
 
+Recreating the webserver is easy to do, and doesn't require restarting either the Tor or the Nyx containers. Simply rebuild the image with no cache to pull the latest Github changes:
+
+`$ docker-compose build --no-cache webserver`
+
+and then recreate it:
+
+`$ docker-compose up --detatch --force-recreate webserver`
+
 ## Nyx Container
 
 Nyx is a [CLI monitoring tool](https://nyx.torproject.org/) that allows you to gain insight to Tor as it runs. It has multiple panes that show connections to Tor nodes, realtime logs, bandwidth graphs, and the current `torrc` configuration to name a few.
