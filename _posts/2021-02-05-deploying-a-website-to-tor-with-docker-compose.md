@@ -279,7 +279,7 @@ Nyx is a [CLI monitoring tool](https://nyx.torproject.org/) that allows you to g
 
 ![Nyx](/assets/images/deploying-tor-nyx.png){: .center-image}
 
-The Nyx container shares the `torrc` and `authcookie` volumes with the Tor container. Also note the `tty: true` and `stdin_open: true` options, which allow the CLI interface to be displayed in the terminal & interacted with when attached using `docker attach`. It also has its own network separate from the webserver, `net_control`.
+The Nyx container shares the `torrc` and `authcookie` volumes with the Tor container. Also note the `tty: true` and `stdin_open: true` options, which allow the CLI interface to be displayed in the terminal & interacted with when attached using `docker-compose attach`. It also has its own network separate from the webserver, `net_control`.
 
 `docker-compose.yml`
 
@@ -328,11 +328,11 @@ USER tor
 CMD nyx -i $(host -4 tor | grep -oE '[^ ]+$'):9051 -s /var/lib/tor/control_auth_cookie
 ```
 
-While running this container, I noticed that it has a memory leak so it'll use as much memory as possible until docker forcibly restarts it. To avoid this, I usually pause the container with `docker pause devedge-tor_nyx_1` and unpause it with `docker unpause devedge-tor_nyx_1` when I want to attach to it.
+While running this container, I noticed that it has a memory leak so it'll use as much memory as possible until docker forcibly restarts it. To avoid this, I usually pause the container with `docker-compose pause nyx` and unpause it with `docker-compose unpause nyx` when I want to attach to it.
 
 Attaching to the container is done with:
 
-`$ docker attach devedge-tor_nyx_1`
+`$ docker-compose attach nyx`
 
 and to detach from the container, hit the sequence `CTRL+p+q`.
 
