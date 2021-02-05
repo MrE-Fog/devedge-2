@@ -271,7 +271,7 @@ Recreating the webserver is easy to do, and doesn't require restarting either th
 
 and then recreate it:
 
-`$ docker-compose up --detatch --force-recreate webserver`
+`$ docker-compose up --detach --force-recreate webserver`
 
 ## Nyx Container
 
