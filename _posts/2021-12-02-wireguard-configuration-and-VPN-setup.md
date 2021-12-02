@@ -159,6 +159,8 @@ AllowedIPs = 0.0.0.0/0, ::/0
 
 Once the configuration files are done, all that's left to do is import them in their respective apps. Activate the VPN, and you should be tunneling through your server with no issues! A far cry from the complicated and often finicky IPsec or OpenVPN setup.
 
+![wg-vpn-status](/assets/images/wg-vpn-status.png){: .center-image}
+
 ## Resources
 - [Official WireGuard Website](https://www.wireguard.com/)
 - [Arch Linux Wiki WireGuard Entry](https://wiki.archlinux.org/title/WireGuard)

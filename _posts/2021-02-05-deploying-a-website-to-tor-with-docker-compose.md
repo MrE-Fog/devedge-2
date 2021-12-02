@@ -242,8 +242,8 @@ The webserver container is very simple. Running on its own isolated network, it 
 `webserver/Dockerfile`
 
 ```dockerfile
-# Use minimal jekyll image
-FROM jekyll/minimal:4.0
+# Use jekyll builder image
+FROM jekyll/builder:4.0
 
 # Git repo will be downloaded here
 WORKDIR /webcontent
