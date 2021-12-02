@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "wireguard configuration and VPN setup"
-description: "Setting up a VPN server behind a NAT on personal home server"
+description: "Setting up a VPN server behind a NAT on personal server"
 date: 2021-12-02
 tags: [wireguard, vpn, configuration, server, networking]
 ---
@@ -52,7 +52,7 @@ $ wg genpsk > ivymike-mac.psk
 
 ## Server Configuration
 
-There are 3 configuration files that need to be set up on the server end of this setup. The first file is called `wg0.conf`, and is saved under `/etc/wireguard/`:
+There are 3 configuration files that need to be set up on the server. The first file is called `wg0.conf`, and is saved under `/etc/wireguard/`:
 
 `wg0.conf`
 
