@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "wireguard configuration and VPN setup"
-description: "Setting up a VPN server behind a NAT on personal server"
+description: "Setting up a VPN server behind a NAT on a personal server"
 date: 2021-12-02
 tags: [wireguard, vpn, configuration, server, networking]
 ---
