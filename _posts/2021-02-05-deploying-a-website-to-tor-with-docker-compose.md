@@ -262,7 +262,8 @@ USER jekyll
 WORKDIR /webcontent/devedge.github.io
 
 # Serve the webserver using Jekyll
-CMD jekyll serve --host 0.0.0.0
+# The _config-onion.yml is to set the onion hostname for the tor-hosted site
+CMD jekyll serve --config _config.yml,_config-onion.yml --host 0.0.0.0
 ```
 
 Recreating the webserver is easy to do, and doesn't require restarting either the Tor or the Nyx containers. Simply rebuild the image with no cache to pull the latest Github changes:
