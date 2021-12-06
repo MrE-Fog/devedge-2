@@ -1,9 +1,9 @@
 ---
 layout: post
 title: "macOS configs part 3 - vim"
-description: ""
+description: "Configuring my preferred CLI editor"
 date: 2021-12-05
-tags: [macOS, configuration, vim, iTerm2, colorscheme, fonts]
+tags: [macOS, configuration, vim, colorscheme, fonts]
 ---
 
 This post covers how I set up vim to work in my environment. It will also be themed with the Nord colorscheme, and will include some keybinds to navigate my environment quicker.
@@ -32,7 +32,7 @@ call plug#end()
 colorscheme nord
 ```
 
-save changes and exit vim (`:wq`), the reopen `~/.vimrc` and type `:PlugInstall` when in NORMAL mode. Close out and reopen the editor again, and you will see the colorscheme applied.
+save the changes and exit vim (`:wq`), then reopen `~/.vimrc` and type `:PlugInstall` when in NORMAL mode. Close out and reopen the editor again, and you will see the colorscheme applied.
 
 ## Custom Statusbar with `vim-airline`
 
@@ -65,7 +65,7 @@ set number           " Show current line number
 set relativenumber   " Show relative line numbers
 ```
 
-To quickly toggle the line numbers on the left, you can type `:set nu! rnu!`. [This blog post](https://jeffkreeftmeijer.com/vim-number/) goes into great detail about line number options in Vim, complete with Gifs.
+To quickly toggle the line numbers on the left, you can type `:set nu! rnu!`. [This blog post](https://jeffkreeftmeijer.com/vim-number/) goes into great detail about line number options in Vim, complete with gifs.
 
 To show special non-printable characters, add these following 2 lines:
 
