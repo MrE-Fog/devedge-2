@@ -4,7 +4,9 @@ layout: default
 
 <header class="header">
   <div class="header-title">
-    <a href="{{ site.url }}{{ site.baseurl }}">{{ site.name }}</a>
+    <div class="root-gradient-text">
+      <a class="gradient-text" href="{{ site.url }}{{ site.baseurl }}">{{ site.name }}</a>
+    </div>
   </div>
   <nav class="header-nav">
     {% for nav in site.nav %}
