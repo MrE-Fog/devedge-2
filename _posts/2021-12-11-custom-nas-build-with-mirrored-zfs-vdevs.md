@@ -150,15 +150,21 @@ The Ethernet ports on the NAS only have a theoretical throughput of 1GbE (1000BA
 All of this testing will be done with a CLI tool called `fio` (Flexible Input/Output tester). In researching how to properly benchmark, I came across [this amazing Ars Technica article](https://arstechnica.com/gadgets/2020/02/how-fast-are-your-disks-find-out-the-open-source-way-with-fio/) that does an excellent job explaining the problems with most benchmarking, and how to properly conduct a file I/O benchmark test. These tests will follow the article and are broken up into 3 sections:
 
 - 4K random I/O, which is worst-case usage (lots of small file writes)
+
     Command: 
+
     `fio --name=random-write --ioengine=posixaio --rw=randwrite --bs=4k --numjobs=1 --size=4g --iodepth=1 --runtime=60 --time_based --end_fsync=1`
     &nbsp;
 - 64K random I/O in sixteen parallel processes, a "middle-of-the-road workload for a busy computer", so closer to regular heavy usage
+
     Command:
+
     `fio --name=random-write --ioengine=posixaio --rw=randwrite --bs=64k --size=256m --numjobs=16 --iodepth=16 --runtime=60 --time_based --end_fsync=1`
     &nbsp;
 - high-end throughput with 1MB random I/O, which is closer to best-case usage
+
     Command:
+
     `fio --name=random-write --ioengine=posixaio --rw=randwrite --bs=1m --size=16g --numjobs=1 --iodepth=1 --runtime=60 --time_based --end_fsync=1`
     &nbsp;
 
@@ -175,51 +181,69 @@ Results:
 
 - NAS <--> Linux server (NFS mount)
     - 4K random I/O
+
         `WRITE bandwidth: 23.0MiB/s`
+
         `Network utilization: 19.29%`
         &nbsp;
 
     - 64K random I/O w/ sixteen parallel processes
+
         `WRITE bandwidth: 44.1MiB/s`
+
         `Network utilization: 36.99%`
         &nbsp;
 
     - 1MB random I/O
+
         `WRITE bandwidth: 80.5MiB/s`
+
         `Network utilization: 67.53%`
         &nbsp;
         &nbsp;
 
 - NAS <--> Mac over wifi (NFS mount)
     - 4K random I/O
+
         `WRITE bandwidth: 3180KiB/s` or `3.11MiB/s`
+
         `Network utilization: 2.6%`
         &nbsp;
 
     - 64K random I/O w/ EIGHT (macOS can't allocate more) parallel processes
+
         `WRITE bandwidth: 13.7MiB/s`
+
         `Network utilization: 11.49%`
         &nbsp;
 
     - 1MB random I/O
+
         `WRITE bandwidth: 17.6MiB/s`
+
         `Network utilization: 14.76%`
         &nbsp;
         &nbsp;
 
 - NAS <--> Mac over Ethernet (NFS mount)
     - 4K random I/O
+
         `WRITE bandwidth: 2994KiB/s`, or `2.92MiB/s`
+
         `Network utilization: 2.45%`
         &nbsp;
 
     - 64K random I/O w/ EIGHT (macOS can't allocate more) parallel processes
+
         `WRITE bandwidth: 24.1MiB/s`
+
         `Network utilization: 20.22%`
         &nbsp;
 
     - 1MB random I/O
+
         `WRITE bandwidth: 30.8MiB/s`
+        
         `Network utilization: 25.84%`
 
 Most of the numbers make sense. Ethernet to Ethernet conenctions are clearly the fastest, with best case scenario usage nearing 70% of total possible thoroughput. (Remember, each individual drive's transfer rate is `133.51 MiB/s`, so the network is the bottleneck at `119.21 MiB/s`.)
