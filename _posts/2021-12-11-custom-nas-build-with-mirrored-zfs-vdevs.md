@@ -18,6 +18,8 @@ This post shows the hardware I used to put it together, some of the steps I took
 -   [FreeNAS installation](#freenas-installation)
 -   [Mirrored ZFS vdevs](#mirrored-zfs-vdevs)
 -   [Benchmarking](#benchmarking)
+-   [TrueNAS](#truenas)
+-   [Resources](#resources)
 
 ## Putting together the NAS
 
@@ -51,7 +53,7 @@ The Supermicro motherboard has only 4 built-in SATA ports but the case fits 6 ha
 
 &nbsp;
 
-This is the meat of the setup: 6 5TB Seagate Barracuda 2.5" hard drives. The single downside to the SilverStone case is that it only takes 2.5" form-factor hard drives, so these bad boys are the largest capacity drives that is commercially available. They run at 5400 RPM, and have an upper working temperature limit of 60 degrees Celsius.
+This is the meat of the setup: 6 5TB Seagate Barracuda 2.5" hard drives. The single downside to the SilverStone case is that it only takes 2.5" form-factor hard drives, so these bad boys are the largest capacity drives commercially available. They run at 5400 RPM, and have an upper working temperature limit of 60 degrees Celsius.
 
 ![nas-build-7](/assets/images/nas-build-7.jpeg){: .center-image}
 
@@ -141,55 +143,108 @@ Once that was done, it was simple work to [add datasets to the pool](https://www
 
 ## Benchmarking
 
-Now that I have the NAS set up, I'm interested in what kind of realistic performance I can get between different systems. The NAS is wired over Ethernet straight to my router, I have another server also wired over Ethernet to my router, and I use a MacBook Pro over wifi. I also occasionally use an adapter on my Mac that had an Ethernet port, so I'd like to test what that throughput looks like.
+Now that I have the NAS set up, I'm interested in what kind of realistic performance I can get between different systems. The NAS is wired over Ethernet straight to my router, I have another server also wired over Ethernet to my router, and I use a MacBook Pro over wifi. I also occasionally use an adapter on my Mac that has an Ethernet port, so I'd like to test what that throughput looks like.
 
 The Ethernet ports on the NAS only have a theoretical throughput of 1GbE (1000BASE-T), so I'll be comparing actual throughput against that.
 
-All of this testing will be done with a CLI tool called `fio` (Flexible Input/Output tester). In researching how to properly benchmark, I came across [this amazing ARC Technica article](https://arstechnica.com/gadgets/2020/02/how-fast-are-your-disks-find-out-the-open-source-way-with-fio/) that does an excellent job explaining the problems with most benchmarking, and how to properly conduct a file I/O benchmark test. These tests will follow the article and are broken up into 3 sections:
+All of this testing will be done with a CLI tool called `fio` (Flexible Input/Output tester). In researching how to properly benchmark, I came across [this amazing Ars Technica article](https://arstechnica.com/gadgets/2020/02/how-fast-are-your-disks-find-out-the-open-source-way-with-fio/) that does an excellent job explaining the problems with most benchmarking, and how to properly conduct a file I/O benchmark test. These tests will follow the article and are broken up into 3 sections:
 
-- 4K random I/O, which is worst-case usage
+- 4K random I/O, which is worst-case usage (lots of small file writes)
     Command: 
     `fio --name=random-write --ioengine=posixaio --rw=randwrite --bs=4k --numjobs=1 --size=4g --iodepth=1 --runtime=60 --time_based --end_fsync=1`
+    &nbsp;
 - 64K random I/O in sixteen parallel processes, a "middle-of-the-road workload for a busy computer", so closer to regular heavy usage
     Command:
     `fio --name=random-write --ioengine=posixaio --rw=randwrite --bs=64k --size=256m --numjobs=16 --iodepth=16 --runtime=60 --time_based --end_fsync=1`
+    &nbsp;
 - high-end throughput with 1MB random I/O, which is closer to best-case usage
     Command:
     `fio --name=random-write --ioengine=posixaio --rw=randwrite --bs=1m --size=16g --numjobs=1 --iodepth=1 --runtime=60 --time_based --end_fsync=1`
+    &nbsp;
 
 I'll run these 3 tests in these following scenarios:
 - I/O between the NAS and a Linux server (WHAT KIND OF MOUNT), both over 1GbE. This will likely give results that show a best-case usage scenario
 - I/O between NAS and Mac over wifi. This will likely show worst-case results.
 - I/O between NAS and Mac over Ethernet through an adapter (WHAT KIND OF MOUNT)
 
+For reference, 1GbE is `1000 Mbit/s` (Megabit/s). That translates to exactly `125 MB/s` (Megabyte/s) or around `119.21 MiB/s` (Mebibytes/s). I'll be comparing against the latter data rate since it's base 2 instead of base 10.
+
 Results:
 
 - NAS <--> Linux server (NFS mount)
     - 4K random I/O
-        WRITE: bw=23.0MiB/s (24.1MB/s), 23.0MiB/s-23.0MiB/s (24.1MB/s-24.1MB/s), io=3209MiB (3365MB), run=139792-139792msec
+        `WRITE bandwidth: 23.0MiB/s`
+        <!-- WRITE: bw= (24.1MB/s), 23.0MiB/s-23.0MiB/s (24.1MB/s-24.1MB/s), io=3209MiB (3365MB), run=139792-139792msec -->
+        `Network utilization: 19.29%`
+        &nbsp;
 
     - 64K random I/O w/ sixteen parallel processes
-        WRITE: bw=44.1MiB/s (46.2MB/s), 2823KiB/s-2944KiB/s (2891kB/s-3015kB/s), io=4111MiB (4311MB), run=89353-93262msec
+        `WRITE bandwidth: 44.1MiB/s`
+        <!-- WRITE: bw=44.1MiB/s (46.2MB/s), 2823KiB/s-2944KiB/s (2891kB/s-3015kB/s), io=4111MiB (4311MB), run=89353-93262msec -->
+        `Network utilization: 36.99%`
+        &nbsp;
 
     - 1MB random I/O
-        WRITE: bw=80.5MiB/s (84.4MB/s), 80.5MiB/s-80.5MiB/s (84.4MB/s-84.4MB/s), io=6922MiB (7258MB), run=85987-85987msec
+        `WRITE bandwidth: 80.5MiB/s`
+        <!-- WRITE: bw=80.5MiB/s (84.4MB/s), 80.5MiB/s-80.5MiB/s (84.4MB/s-84.4MB/s), io=6922MiB (7258MB), run=85987-85987msec -->
+        `Network utilization: 67.53%`
+        &nbsp;
+        &nbsp;
 
 - NAS <--> Mac over wifi (NFS mount)
     - 4K random I/O
-        WRITE: bw=3180KiB/s (3257kB/s), 3180KiB/s-3180KiB/s (3257kB/s-3257kB/s), io=192MiB (202MB), run=61880-61880msec
+        `WRITE bandwidth: 3180KiB/s` or `3.11MiB/s`
+        <!-- WRITE: bw=3180KiB/s (3257kB/s), 3180KiB/s-3180KiB/s (3257kB/s-3257kB/s), io=192MiB (202MB), run=61880-61880msec -->
+        `Network utilization: 2.6%`
+        &nbsp;
 
     - 64K random I/O w/ EIGHT (macOS can't allocate more) parallel processes
-        WRITE: bw=13.7MiB/s (14.3MB/s), 157KiB/s-2518KiB/s (161kB/s-2579kB/s), io=831MiB (872MB), run=60284-60760msec
+        `WRITE bandwidth: 13.7MiB/s`
+        <!-- WRITE: bw=13.7MiB/s (14.3MB/s), 157KiB/s-2518KiB/s (161kB/s-2579kB/s), io=831MiB (872MB), run=60284-60760msec -->
+        `Network utilization: 11.49%`
+        &nbsp;
 
     - 1MB random I/O
-        WRITE: bw=17.6MiB/s (18.5MB/s), 17.6MiB/s-17.6MiB/s (18.5MB/s-18.5MB/s), io=1060MiB (1111MB), run=60240-60240msec
+        `WRITE bandwidth: 17.6MiB/s`
+        <!-- WRITE: bw=17.6MiB/s (18.5MB/s), 17.6MiB/s-17.6MiB/s (18.5MB/s-18.5MB/s), io=1060MiB (1111MB), run=60240-60240msec -->
+        `Network utilization: 14.76%`
+        &nbsp;
+        &nbsp;
 
 - NAS <--> Mac over Ethernet (NFS mount)
     - 4K random I/O
-        WRITE: bw=2994KiB/s (3066kB/s), 2994KiB/s-2994KiB/s (3066kB/s-3066kB/s), io=178MiB (187MB), run=60865-60865msec
+        `WRITE bandwidth: 2994KiB/s`, or `2.92MiB/s`
+        <!-- WRITE: bw=2994KiB/s (3066kB/s), 2994KiB/s-2994KiB/s (3066kB/s-3066kB/s), io=178MiB (187MB), run=60865-60865msec -->
+        `Network utilization: 2.45%`
+        &nbsp;
 
     - 64K random I/O w/ sixteen parallel processes
-        WRITE: bw=24.1MiB/s (25.2MB/s), 1125KiB/s-4437KiB/s (1152kB/s-4544kB/s), io=1496MiB (1569MB), run=61237-62156msec
+        `WRITE bandwidth: 24.1MiB/s`
+        <!-- WRITE: bw=24.1MiB/s (25.2MB/s), 1125KiB/s-4437KiB/s (1152kB/s-4544kB/s), io=1496MiB (1569MB), run=61237-62156msec -->
+        `Network utilization: 20.22%`
+        &nbsp;
 
     - 1MB random I/O
-        WRITE: bw=30.8MiB/s (32.3MB/s), 30.8MiB/s-30.8MiB/s (32.3MB/s-32.3MB/s), io=1857MiB (1947MB), run=60256-60256msec
+        `WRITE bandwidth: 30.8MiB/s`
+        <!-- WRITE: bw=30.8MiB/s (32.3MB/s), 30.8MiB/s-30.8MiB/s (32.3MB/s-32.3MB/s), io=1857MiB (1947MB), run=60256-60256msec -->
+        `Network utilization: 25.84%`
+
+Most of the numbers make sense. Ethernet to Ethernet conenctions are clearly the fastest, with best case scenario usage nearing 70% of total possible thoroughput. (Remember, each individual drive's transfer rate is `133.51 MiB/s`, so the network is the bottleneck at `119.21 MiB/s`.)
+
+The one interesting anomaly is how 4K random I/O was faster over wifi with my Mac then when using the Ethernet adapter. I couldn't exactly figure out why, but my suspicion is to blame the controller chip(s) in the adapter. Otherwise, massive transfers & heavy I/O workloads still outperformed on the Ethernet adapter than on the wifi.
+
+Overall, I'm happy with the results. I can use this list to estimate the theoretical best-case performance when transferring files across the NAS, and plan ahead for how long they'll take.
+
+## TrueNAS
+
+Recently, iXsystems decided to merge their commercial TrueNAS offering with FreeNAS, while offering all the same FreeNAS functionality under the new TrueNAS CORE version. Installation and general usage is identical, so this guide will still be accurate and applicable.
+
+## Resources
+- [Tom's Hardware Seagate Barracuda specs](https://www.tomshardware.com/news/seagate-barracuda-firecuda-hdd-sshd,32860.html)
+- [FreeNAS/TrueNAS CORE ISO](https://www.truenas.com/download-tn-core/)
+- [Balena Etcher](https://www.balena.io/etcher/)
+- [ZFS Mirror vdevs vs RAIDZ](https://jrs-s.net/2015/02/06/zfs-you-should-use-mirror-vdevs-not-raidz/)
+- [ZFS Pools](https://www.truenas.com/docs/hub/initial-setup/storage/pools/)
+- [Adding datasets to pools](https://www.truenas.com/docs/hub/initial-setup/storage/datasets/).
+- [Ars Technica FIO Benchmarking](https://arstechnica.com/gadgets/2020/02/how-fast-are-your-disks-find-out-the-open-source-way-with-fio/)
+- [Bonus FIO Output Explanation](https://tobert.github.io/post/2014-04-17-fio-output-explained.html)
